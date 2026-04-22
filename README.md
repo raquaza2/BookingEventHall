@@ -1,6 +1,6 @@
 # Grand Aurora Hall Booking App
 
-A responsive hall and venue booking web app built with `Next.js`, `TypeScript`, `Tailwind CSS`, `Prisma`, and `SQLite`.
+A responsive hall and venue booking web app built with `Next.js`, `TypeScript`, `Tailwind CSS`, `Prisma`, and `PostgreSQL`.
 
 This project includes:
 
@@ -18,7 +18,7 @@ This project includes:
 - `TypeScript`
 - `Tailwind CSS`
 - `Prisma`
-- `SQLite`
+- `PostgreSQL`
 - `Zod`
 
 ## Features
@@ -62,7 +62,7 @@ npm install
 Create a local `.env` file based on `.env.example`:
 
 ```env
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
 ADMIN_EMAIL="admin@grandaurora.com"
 ADMIN_PASSWORD="ChangeMe123!"
 SESSION_SECRET="replace-with-a-long-random-secret"
@@ -101,8 +101,9 @@ You can change these values in your `.env` file before running `npm run db:seed`
 - `npm run lint` - Run ESLint
 - `npm run typecheck` - Run TypeScript checks
 - `npm run db:generate` - Generate Prisma client
-- `npm run db:push` - Push schema to the SQLite database
+- `npm run db:push` - Push schema to the PostgreSQL database
 - `npm run db:seed` - Seed demo venue and admin data
+- `npm run vercel-build` - Generate Prisma client and build for Vercel-style deployment
 
 ## Booking Rules
 
@@ -126,4 +127,40 @@ npm run build
 
 - `.env` is intentionally ignored and should not be committed
 - `.env.example` is included for setup
-- Prisma uses `SQLite` for the MVP and can be adapted later for Postgres
+- Prisma is configured for `PostgreSQL`, which is a better fit for hosted deployments than SQLite
+
+## Hosting on Vercel
+
+This project is now prepared for a typical `Vercel + Postgres` deployment flow.
+
+### Recommended deployment setup
+
+1. Create a Postgres database
+2. Import the GitHub repository into Vercel
+3. Add the required environment variables in Vercel
+4. Run the Prisma schema against the hosted database
+5. Deploy the app
+
+### Required environment variables
+
+Add these in your Vercel project settings:
+
+- `DATABASE_URL`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `SESSION_SECRET`
+
+### Suggested Vercel flow
+
+1. Connect your GitHub repository to Vercel
+2. Set `DATABASE_URL` to your hosted Postgres connection string
+3. Add the admin credentials and session secret
+4. Use the default build command or `npm run vercel-build`
+5. Run `npx prisma db push` once against the production database
+6. Run `npm run db:seed` if you want the default venue and admin record created
+
+### Notes
+
+- The app does not need a custom `vercel.json` file for standard Next.js hosting
+- Do not commit production secrets to GitHub
+- If you use Vercel preview deployments, consider using a separate preview database so preview schema changes do not affect production
