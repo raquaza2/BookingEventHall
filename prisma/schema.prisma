@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  pending
+  approved
+  rejected
+}
+
+model Venue {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  tagline        String
+  description    String
+  location       String
+  capacity       Int
+  priceLabel     String
+  heroImage      String
+  galleryImages  String
+  amenities      String
+  houseRules     String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  customerName  String
+  email         String
+  phone         String
+  eventType     String
+  guestCount    Int
+  bookingDate   DateTime
+  slotId        String
+  slotLabel     String
+  notes         String?
+  status        BookingStatus @default(pending)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([bookingDate, status])
+  @@index([status, createdAt])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
